@@ -6,6 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <script>
+        (function() {
+            var urlParams = window.location.search;
+            if (urlParams.includes('igsh=') || urlParams.includes('fbclid=') || urlParams.includes('line=')) {
+                var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                window.history.replaceState(null, '', cleanUrl);
+            }
+        })();
+    </script>
+
     <title>🌿 Kunlarot & Kassara 🌿</title>
     
     <style>
@@ -22,9 +32,59 @@
             height: 100%;
             border: none;
         }
+        
+        /* สไตล์สำหรับหน้าต่างแจ้งเตือนเปิดในเบราว์เซอร์ */
+        #ig-warning-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: #FFFCFB;
+            z-index: 999999;
+            display: none; /* ซ่อนไว้เป็นค่าเริ่มต้น */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            font-family: 'Tenor Sans', sans-serif, 'Noto Serif Thai', serif; /* ใช้ฟอนต์ธีมงานแต่ง */
+        }
     </style>
 </head>
 <body>
+
+    <div id="ig-warning-overlay">
+        <div style="width:80px; height:80px; background-color:#fbeee6; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8e1e1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+        </div>
+        <h2 style="color:#8e1e1c; font-size:24px; font-weight:bold; margin-bottom:15px;">กรุณาเปิดในเบราว์เซอร์</h2>
+        <p style="color:#4A3C35; font-size:15px; line-height:1.6; margin-bottom:30px;">
+            เพื่อให้วิดีโอและระบบตอบรับ (RSVP)<br>แสดงผลได้อย่างสมบูรณ์แบบ 100%<br><br>
+            กรุณากดที่ <b>จุด 3 จุด (มุมขวาบน)</b><br>
+            และเลือก <b>"เปิดในเบราว์เซอร์"</b><br>
+            (Open in Safari / Chrome)
+        </p>
+        <button onclick="document.getElementById('ig-warning-overlay').style.display='none'" style="background:none; border:none; border-bottom:1px solid #B8A398; color:#B8A398; font-size:12px; cursor:pointer; padding-bottom:2px;">คลิกที่นี่ หากต้องการฝืนใช้งานต่อ</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            // ดักจับ IG, FB, LINE
+            var isInAppBrowser = /Instagram|FBAN|FBAV|Line/i.test(userAgent);
+
+            if (isInAppBrowser) {
+                // ถ้าใช่ ให้โชว์หน้าต่างแจ้งเตือน
+                document.getElementById('ig-warning-overlay').style.display = 'flex';
+            }
+        });
+    </script>
+
     <iframe src="https://script.google.com/macros/s/AKfycbwZMN93MHv6VZxIM59kOIkItNYWW20BAN9cUhbICDb1899kMx0wX1NSCWFmBbOdW2uTkw/exec"></iframe>
+
 </body>
 </html>
