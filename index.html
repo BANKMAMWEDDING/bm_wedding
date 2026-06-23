@@ -190,30 +190,33 @@
                 setFormData(prev => ({ ...prev, [name]: value }));
             };
 
-            // ✅ ฟังก์ชันส่งข้อมูลด้วย Fetch API (ไม่มีการใช้ google.script.run แล้ว)
             const handleSubmit = (e) => {
                 e.preventDefault();
                 setIsLoading(true);
 
-                // นำ URL ปลายทางของ Google Apps Script ของคุณมาใส่ตรงนี้
+                // เปลี่ยนเป็นลิงก์ URL ของการทำ deployment ใหม่
                 const scriptURL = 'https://script.google.com/macros/s/AKfycbwZMN93MHv6VZxIM59kOIkItNYWW20BAN9cUhbICDb1899kMx0wX1NSCWFmBbOdW2uTkw/exec';
                 
-                // แปลงข้อมูลให้อยู่ในรูปแบบ URL Encoded เพื่อให้ส่งข้ามโดเมนได้ไม่ติด CORS
-                const formBody = new URLSearchParams(formData).toString();
-
+                // ใช้ text/plain ส่งเป็น string ธรรมดาเพื่อเลี่ยง CORS Preflight Request
                 fetch(scriptURL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formBody
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(formData)
                 })
-                .then(response => response.json())
+                .then(response => {
+                     // ตรวจสอบว่า HTTP status โอเคหรือไม่ 
+                    if (!response.ok) { throw new Error('Network error'); }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Success:', data);
                     setIsSubmitted(true);
                     setIsLoading(false);
                 })
                 .catch(error => {
                     console.error('Submit Error:', error.message);
-                    // ทริกเกอร์ success เป็น Fallback ไว้ เพราะบางกรณีส่งข้อมูลติดแล้วแต่ติดเรื่อง CORS return response
+                    // Google Apps Script อาจเปลี่ยนเส้นทาง (Redirect) ไปหน้าสำเร็จ
+                    // ทำให้ฝั่ง Client ถูก CORS บล็อกผลลัพธ์ตอบกลับ แต่ข้อมูลเข้าชีตเรียบร้อยแล้ว
                     setIsSubmitted(true);
                     setIsLoading(false);
                 });
